@@ -1,0 +1,41 @@
+# Create employee.txt first:
+# John 5000
+# Alice 7000
+# Bob 6000
+# Carol 8000
+# Dave 5500
+
+awk 'BEGIN {
+    print "Name       Salary"
+    print "------------------"
+    total = 0; count = 0
+}
+{
+    printf "%-10s %d\n", $1, $2
+    total += $2
+    count++
+}
+END {
+    printf "------------------\n"
+    printf "Average Pay: %.2f\n", total/count
+}' employee.txt
+
+# Create students.txt first:
+# 1 Alice 75 80 90
+# 2 Bob 45 55 40
+# 3 Carol 80 85 95
+# 4 Dave 30 40 50
+
+awk 'BEGIN {
+    printf "%-5s %-10s %-6s %-6s %s\n","Roll","Name","Total","Avg","Result"
+    print "==========================================="
+}
+{
+    total = $3 + $4 + $5
+    avg = total / 3
+    if ($3>=50 && $4>=50 && $5>=50)
+        result = "PASS"
+    else
+        result = "FAIL"
+    printf "%-5s %-10s %-6d %-6.1f %s\n", $1,$2,total,avg,result
+}' students.txt
