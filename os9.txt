@@ -1,0 +1,61 @@
+#include <stdio.h>
+#include <string.h>
+#define MAX 10
+
+void best_fit(int blocks[], int nb, int procs[], int np) {
+    int alloc[MAX], bsize[MAX];
+    memset(alloc,-1,sizeof(alloc));
+    for (int i=0;i<nb;i++) bsize[i]=blocks[i];
+
+    for (int i=0;i<np;i++) {
+        int best=-1;
+        for (int j=0;j<nb;j++)
+            if (bsize[j]>=procs[i])
+                if (best==-1 || bsize[j]<bsize[best]) best=j;
+        if (best!=-1) { alloc[i]=best; bsize[best]-=procs[i]; }
+    }
+    printf("\n--- Best Fit ---\n");
+    for (int i=0;i<np;i++) {
+        if (alloc[i]==-1)
+            printf("P%d (size %d) -> Not Allocated\n",i+1,procs[i]);
+        else
+            printf("P%d (size %d) -> Block %d (orig size %d)\n",
+                i+1,procs[i],alloc[i]+1,blocks[alloc[i]]);
+    }
+}
+
+void first_fit(int blocks[], int nb, int procs[], int np) {
+    int alloc[MAX], bsize[MAX];
+    memset(alloc,-1,sizeof(alloc));
+    for (int i=0;i<nb;i++) bsize[i]=blocks[i];
+
+    for (int i=0;i<np;i++)
+        for (int j=0;j<nb;j++)
+            if (bsize[j]>=procs[i]) {
+                alloc[i]=j; bsize[j]-=procs[i]; break;
+            }
+    printf("\n--- First Fit ---\n");
+    for (int i=0;i<np;i++) {
+        if (alloc[i]==-1)
+            printf("P%d (size %d) -> Not Allocated\n",i+1,procs[i]);
+        else
+            printf("P%d (size %d) -> Block %d (orig size %d)\n",
+                i+1,procs[i],alloc[i]+1,blocks[alloc[i]]);
+    }
+}
+
+int main() {
+    int blocks[]={100,500,200,300,600};
+    int procs[]={212,417,112,426};
+    int nb=5, np=4;
+
+    printf("Blocks: ");
+    for(int i=0;i<nb;i++) printf("%d ",blocks[i]);
+    printf("\nProcesses: ");
+    for(int i=0;i<np;i++) printf("%d ",procs[i]);
+
+    best_fit(blocks,nb,procs,np);
+    first_fit(blocks,nb,procs,np);
+    return 0;
+}
+// gcc exp9.c -o exp9 && ./exp9
