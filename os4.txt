@@ -1,0 +1,41 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <dirent.h>
+
+int main() {
+    // fork() and getpid()
+    pid_t pid = fork();
+    if (pid < 0) {
+        perror("Fork failed");
+        exit(1);
+    } else if (pid == 0) {
+        printf("CHILD: PID=%d, Parent PID=%d\n", getpid(), getppid());
+
+        // exec()
+        char *args[] = {"ls", "-l", NULL};
+        execvp("ls", args);
+        perror("exec failed");
+        exit(1);
+    } else {
+        printf("PARENT: PID=%d, Child PID=%d\n", getpid(), pid);
+        wait(NULL);
+    }
+
+    // opendir() and readdir()
+    DIR *dir = opendir(".");
+    struct dirent *entry;
+    if (dir == NULL) {
+        perror("opendir failed");
+        return 1;
+    }
+    printf("\nDirectory Contents:\n");
+    while ((entry = readdir(dir)) != NULL) {
+        printf("  %s\n", entry->d_name);
+    }
+    closedir(dir);
+    return 0;
+}
+// gcc exp4.c -o exp4 && ./exp4
