@@ -1,0 +1,24 @@
+#!/bin/bash
+ls
+ls -l
+ls -a
+pwd
+mkdir testdir
+cd testdir
+touch file.txt
+cat file.txt
+cp file.txt file2.txt
+mv file2.txt renamed.txt
+rm renamed.txt
+cd ..
+rmdir testdir
+ps aux
+top
+df -h
+free -h
+uname -a
+whoami
+date
+grep "hello" file.txt
+find / -name "file.txt"
+chmod 755 file.txt
