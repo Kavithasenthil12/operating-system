@@ -1,0 +1,98 @@
+#include <stdio.h>
+#include <string.h>
+#include <limits.h>
+#define MAX 10
+
+int frames[MAX], n, f;
+
+int inFrames(int page) {
+    for (int i=0;i<f;i++) if (frames[i]==page) return i;
+    return -1;
+}
+
+void printFrames() {
+    for (int i=0;i<f;i++)
+        frames[i]==-1 ? printf("- ") : printf("%d ",frames[i]);
+    printf("\n");
+}
+
+void lru(int pages[]) {
+    int faults=0, last[MAX]={0};
+    memset(frames,-1,sizeof(frames));
+    printf("\n--- LRU ---\n");
+    for (int i=0;i<n;i++) {
+        int idx=inFrames(pages[i]);
+        if (idx==-1) {
+            int lruIdx=0;
+            for (int j=1;j<f;j++) if (last[j]<last[lruIdx]) lruIdx=j;
+            frames[lruIdx]=pages[i];
+            last[lruIdx]=i;
+            faults++;
+            printf("Page %d -> FAULT  | ",pages[i]);
+        } else {
+            last[idx]=i;
+            printf("Page %d -> HIT    | ",pages[i]);
+        }
+        printFrames();
+    }
+    printf("Total Faults: %d\n",faults);
+}
+
+void optimal(int pages[]) {
+    int faults=0;
+    memset(frames,-1,sizeof(frames));
+    printf("\n--- Optimal ---\n");
+    for (int i=0;i<n;i++) {
+        int idx=inFrames(pages[i]);
+        if (idx==-1) {
+            int replace=0, farthest=-1;
+            for (int j=0;j<f;j++) {
+                int next=INT_MAX;
+                for (int k=i+1;k<n;k++)
+                    if (pages[k]==frames[j]) { next=k; break; }
+                if (next>farthest) { farthest=next; replace=j; }
+            }
+            frames[replace]=pages[i];
+            faults++;
+            printf("Page %d -> FAULT  | ",pages[i]);
+        } else {
+            printf("Page %d -> HIT    | ",pages[i]);
+        }
+        printFrames();
+    }
+    printf("Total Faults: %d\n",faults);
+}
+
+void fifo(int pages[]) {
+    int faults=0, ptr=0;
+    memset(frames,-1,sizeof(frames));
+    printf("\n--- FIFO ---\n");
+    for (int i=0;i<n;i++) {
+        int idx=inFrames(pages[i]);
+        if (idx==-1) {
+            frames[ptr]=pages[i];
+            ptr=(ptr+1)%f;
+            faults++;
+            printf("Page %d -> FAULT  | ",pages[i]);
+        } else {
+            printf("Page %d -> HIT    | ",pages[i]);
+        }
+        printFrames();
+    }
+    printf("Total Faults: %d\n",faults);
+}
+
+int main() {
+    int pages[]={7,0,1,2,0,3,0,4,2,3,0,3,2,1,2,0,1,7,0,1};
+    n=20; f=3;
+
+    printf("Reference String: ");
+    for (int i=0;i<n;i++) printf("%d ",pages[i]);
+    printf("\nFrames: %d\n",f);
+
+    lru(pages);
+    optimal(pages);
+    fifo(pages);
+    return 0;
+}
+// gcc exp10.c -o exp10 && ./exp10
